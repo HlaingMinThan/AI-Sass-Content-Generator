@@ -169,8 +169,8 @@ class ContentController extends Controller
             ],
             'Caption' => [
                 'role' => 'You are a social media caption writer.',
-                'instruction' => 'Write 5 distinct types of captions for this topic. Each must have its specific title.',
-                'format' => "### 1. Short & Strong Hook\n(One powerful line)\n\n### 2. Click-Worthy Hook + CTA\n(Hook and engagement line)\n\n### 3. Catchy & Creative\n(Creative angle)\n\n### 4. Professional & Authoritative\n(Formal tone)\n\n### 5. Relatable / Meme Style\n(Humorous or trend-aware)\n\n### [Recommended Hashtags]\n(Relevant tags)"
+                'instruction' => 'Generate 10 different one-sentence captions about the topic. Each must be only ONE sentence (short and punchy), include a strong hook, and follow a specific style.',
+                'format' => "### 1. Catchy:\n[one sentence caption]\n\n### 2. Story-based:\n[one sentence caption]\n\n### 3. Question:\n[one sentence caption]\n\n### 4. Bold Statement:\n[one sentence caption]\n\n### 5. Relatable:\n[one sentence caption]\n\n### 6. Problem-Solution:\n[one sentence caption]\n\n### 7. Emotional:\n[one sentence caption]\n\n### 8. Curiosity:\n[one sentence caption]\n\n### 9. CTA (Call to Action):\n[one sentence caption]\n\n### 10. Contrarian:\n[one sentence caption]\n\n### [Hashtags]\n(Relevant hashtags here)"
             ],
             'Blog Post' => [
                 'role' => 'You are a blog writer.',
