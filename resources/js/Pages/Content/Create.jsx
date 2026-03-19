@@ -23,13 +23,13 @@ import {
 import { cn } from '@/lib/utils';
 
 export default function CreateContent() {
-    const { customTones } = usePage().props;
+    const { customTones, preferredTone } = usePage().props;
     const user = usePage().props.auth.user;
     
     const { data, setData, post, processing, errors, reset } = useForm({
         topic: '',
         content_type: 'Blog Post',
-        tone: 'professional',
+        tone: preferredTone || 'professional',
         language: 'burmese',
         keywords: '',
     });

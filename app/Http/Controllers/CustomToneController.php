@@ -12,7 +12,8 @@ class CustomToneController extends Controller
     public function index()
     {
         return Inertia::render('CustomTones/Index', [
-            'customTones' => Auth::user()->customTones()->latest()->get()
+            'customTones' => Auth::user()->customTones()->latest()->get(),
+            'preferredTone' => Auth::user()->preference?->preferred_tone
         ]);
     }
 
@@ -55,5 +56,19 @@ class CustomToneController extends Controller
         $customTone->delete();
 
         return back()->with('success', 'Custom tone deleted successfully!');
+    }
+
+    public function setDefault(Request $request, CustomTone $customTone)
+    {
+        if ($customTone->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        Auth::user()->preference()->updateOrCreate(
+            ['user_id' => Auth::id()],
+            ['preferred_tone' => "custom-{$customTone->id}"]
+        );
+
+        return back()->with('success', "{$customTone->name} set as default tone!");
     }
 }

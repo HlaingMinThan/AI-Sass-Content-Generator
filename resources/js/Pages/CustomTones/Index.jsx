@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import AppLayout from '@/Layouts/AppLayout';
 import { Head, useForm } from '@inertiajs/react';
-import { Plus, Pencil, Trash2, Save, X, MessageSquare, Info, Sparkles } from 'lucide-react';
+import { Plus, Pencil, Trash2, Save, X, MessageSquare, Info, Sparkles, CheckCircle2, Bookmark } from 'lucide-react';
 import InputError from '@/Components/InputError';
 import InputLabel from '@/Components/InputLabel';
 import TextInput from '@/Components/TextInput';
 import PrimaryButton from '@/Components/PrimaryButton';
 
-export default function Index({ customTones }) {
+export default function Index({ customTones, preferredTone }) {
     const [editingTone, setEditingTone] = useState(null);
     const [isCreating, setIsCreating] = useState(false);
 
@@ -57,6 +57,10 @@ export default function Index({ customTones }) {
         if (confirm('Are you sure you want to delete this custom tone?')) {
             destroy(route('custom-tones.destroy', id));
         }
+    };
+
+    const handleSetDefault = (id) => {
+        post(route('custom-tones.default', id));
     };
 
     return (
@@ -227,6 +231,12 @@ export default function Index({ customTones }) {
                                             <div className="flex items-center gap-2">
                                                 <h3 className="text-lg font-bold truncate">{tone.name}</h3>
                                                 <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary">Custom</span>
+                                                {preferredTone === `custom-${tone.id}` && (
+                                                    <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-amber-500/10 text-amber-500 border border-amber-500/20 flex items-center gap-1 animate-in zoom-in duration-300">
+                                                        <CheckCircle2 className="w-2.5 h-2.5" />
+                                                        Default
+                                                    </span>
+                                                )}
                                             </div>
                                             {tone.description && (
                                                 <p className="text-sm text-muted-foreground mt-1 truncate">{tone.description}</p>
@@ -238,6 +248,15 @@ export default function Index({ customTones }) {
                                             )}
                                         </div>
                                         <div className="flex items-center gap-2 self-end md:self-center">
+                                            {preferredTone !== `custom-${tone.id}` && (
+                                                <button
+                                                    onClick={() => handleSetDefault(tone.id)}
+                                                    className="p-2.5 rounded-xl border border-border hover:bg-amber-500/10 hover:text-amber-500 transition-all text-muted-foreground group"
+                                                    title="Set as Default"
+                                                >
+                                                    <Bookmark className="w-4 h-4 group-hover:fill-amber-500/20" />
+                                                </button>
+                                            )}
                                             <button
                                                 onClick={() => startEditing(tone)}
                                                 className="p-2.5 rounded-xl border border-border hover:bg-muted hover:text-primary transition-all text-muted-foreground"

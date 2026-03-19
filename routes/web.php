@@ -41,6 +41,7 @@ Route::middleware('auth')->group(function () {
 
     // Custom Tone Routes
     Route::resource('custom-tones', \App\Http\Controllers\CustomToneController::class)->except(['create', 'show', 'edit']);
+    Route::post('/custom-tones/{customTone}/default', [\App\Http\Controllers\CustomToneController::class, 'setDefault'])->name('custom-tones.default');
 });
 
 require __DIR__.'/auth.php';

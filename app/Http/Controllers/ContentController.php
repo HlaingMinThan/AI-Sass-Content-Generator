@@ -24,7 +24,8 @@ class ContentController extends Controller
     public function create()
     {
         return Inertia::render('Content/Create', [
-            'customTones' => Auth::user()->customTones()->get()
+            'customTones' => Auth::user()->customTones()->get(),
+            'preferredTone' => Auth::user()->preference?->preferred_tone
         ]);
     }
 
