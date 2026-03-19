@@ -17,7 +17,8 @@ import {
     Megaphone,
     MessageSquareQuote,
     FileText,
-    MousePointer2
+    MousePointer2,
+    AlertCircle
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -25,7 +26,7 @@ export default function CreateContent() {
     const { customTones } = usePage().props;
     const user = usePage().props.auth.user;
     
-    const { data, setData, post, processing, errors } = useForm({
+    const { data, setData, post, processing, errors, reset } = useForm({
         topic: '',
         content_type: 'Blog Post',
         tone: 'professional',
@@ -47,6 +48,21 @@ export default function CreateContent() {
                     
                     {/* Main Form Section */}
                     <div className="lg:col-span-2 space-y-6">
+                        {/* Global Error Display */}
+                        {(errors.ai_error || errors.credits) && (
+                            <div className="bg-destructive/10 border border-destructive/20 rounded-2xl p-4 flex items-start gap-3 animate-in fade-in slide-in-from-top-4 duration-300">
+                                <div className="p-2 bg-destructive/20 rounded-lg">
+                                    <AlertCircle className="w-5 h-5 text-destructive" />
+                                </div>
+                                <div className="space-y-1">
+                                    <h4 className="text-sm font-bold text-destructive uppercase tracking-wider">Attention Required</h4>
+                                    <p className="text-sm text-destructive/90 font-medium leading-relaxed">
+                                        {errors.ai_error || errors.credits}
+                                    </p>
+                                </div>
+                            </div>
+                        )}
+
                         <div className="relative overflow-hidden rounded-3xl border bg-card/50 backdrop-blur-sm shadow-xl border-white/10">
                             <div className="absolute top-0 right-0 p-8 opacity-5">
                                 <Sparkles className="w-32 h-32" />

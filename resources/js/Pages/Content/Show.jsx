@@ -13,7 +13,8 @@ import {
     FileText,
     Share2,
     Trash2,
-    Download
+    Download,
+    AlertCircle
 } from 'lucide-react';
 import { useState, useEffect, useMemo } from 'react';
 import { cn } from '@/lib/utils';
@@ -25,7 +26,7 @@ export default function ShowContent({ history }) {
     const [wordCount, setWordCount] = useState(0);
     const [readingTime, setReadingTime] = useState(0);
 
-    const { data, setData, post: postRegenerate, processing: regenerating } = useForm({
+    const { data, setData, post: postRegenerate, processing: regenerating, errors: errorsRegenerate } = useForm({
         refinement: '',
     });
 
@@ -213,6 +214,12 @@ export default function ShowContent({ history }) {
                                 </div>
 
                                 <form onSubmit={handleRegenerate} className="flex-1 space-y-4">
+                                    {errorsRegenerate.ai_error && (
+                                        <div className="bg-destructive/10 border border-destructive/20 rounded-2xl p-4 flex items-start gap-3">
+                                            <AlertCircle className="w-5 h-5 text-destructive shrink-0 mt-0.5" />
+                                            <p className="text-sm text-destructive font-medium">{errorsRegenerate.ai_error}</p>
+                                        </div>
+                                    )}
                                     <div className="relative">
                                         <textarea
                                             value={data.refinement}
