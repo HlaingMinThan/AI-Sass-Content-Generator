@@ -10,14 +10,22 @@ use App\Ai\Agents\ContentGeneratorAgent;
 
 class ContentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $histories = ContentHistory::where('user_id', Auth::id())
-            ->latest()
-            ->paginate(10);
+        $query = ContentHistory::where('user_id', Auth::id());
+
+        if ($request->filled('search')) {
+            $query->where(function($q) use ($request) {
+                $q->where('topic', 'like', '%' . $request->search . '%')
+                  ->orWhere('generated_content', 'like', '%' . $request->search . '%');
+            });
+        }
+
+        $histories = $query->latest()->paginate(10)->withQueryString();
 
         return Inertia::render('Content/Index', [
-            'histories' => $histories
+            'histories' => $histories,
+            'filters' => $request->only(['search'])
         ]);
     }
 
