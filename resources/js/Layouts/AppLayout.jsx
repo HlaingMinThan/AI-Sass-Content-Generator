@@ -10,8 +10,8 @@ export default function AppLayout({ header, children }) {
 
     const navigation = [
         { name: 'Dashboard', href: route('dashboard'), icon: LayoutDashboard, current: route().current('dashboard') },
-        { name: 'Custom Tones', href: route('custom-tones.index'), icon: Palette, current: route().current('custom-tones.*') },
         { name: 'Content History', href: route('content.history.index'), icon: History, current: route().current('content.history.*') },
+        { name: 'Custom Tones', href: route('custom-tones.index'), icon: Palette, current: route().current('custom-tones.*') },
         { name: 'Billing', href: route('billing.index'), icon: CreditCard, current: route().current('billing.*') },
     ];
 
