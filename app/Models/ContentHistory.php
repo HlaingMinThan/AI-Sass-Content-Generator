@@ -11,8 +11,11 @@ class ContentHistory extends Model
         'model_used',
         'prompt',
         'topic',
-        'tone_name',
+        'tone',
         'content_type',
+        'language',
+        'keywords',
+        'last_refinement',
         'generated_content',
     ];
 

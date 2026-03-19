@@ -22,20 +22,75 @@ import { marked } from 'marked';
 import DOMPurify from 'dompurify';
 
 export default function ShowContent({ history }) {
-    const [copied, setCopied] = useState(false);
-    const [wordCount, setWordCount] = useState(0);
-    const [readingTime, setReadingTime] = useState(0);
+    const [streamedContent, setStreamedContent] = useState(history.generated_content || '');
+    const [isStreaming, setIsStreaming] = useState(!history.generated_content);
+    const [streamError, setStreamError] = useState(null);
 
     const { data, setData, post: postRegenerate, processing: regenerating, errors: errorsRegenerate } = useForm({
         refinement: '',
     });
 
+    const startStreaming = async () => {
+        setIsStreaming(true);
+        setStreamedContent('');
+        setStreamError(null);
+        
+        try {
+            const response = await fetch(route('content.history.stream', history.id));
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            
+            let accumulatedContent = "";
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+                
+                const chunk = decoder.decode(value, { stream: true });
+                const lines = chunk.split("\n\n");
+                
+                for (const line of lines) {
+                    if (line.startsWith("data: ")) {
+                        const dataStr = line.replace("data: ", "");
+                        if (dataStr === "[DONE]") {
+                            setIsStreaming(false);
+                            return;
+                        }
+                        
+                        try {
+                            const parsed = JSON.parse(dataStr);
+                            if (parsed.token) {
+                                accumulatedContent += parsed.token;
+                                setStreamedContent(accumulatedContent);
+                            }
+                            if (parsed.error) {
+                                setStreamError(parsed.error);
+                                setIsStreaming(false);
+                            }
+                        } catch (e) {
+                            // Handle partial JSON chunks if they occur
+                        }
+                    }
+                }
+            }
+        } catch (error) {
+            setStreamError("An error occurred while streaming the content.");
+            setIsStreaming(false);
+        }
+    };
+
+    useEffect(() => {
+        if (!history.generated_content) {
+            startStreaming();
+        }
+    }, [history.id]);
+
     const parsedHtml = useMemo(() => {
-        if (!history?.generated_content) return '';
-        // Configure marked options if needed
-        const rawHtml = marked.parse(history.generated_content);
+        const contentToParse = isStreaming ? streamedContent : (history.generated_content || streamedContent);
+        if (!contentToParse) return '';
+        const rawHtml = marked.parse(contentToParse);
         return DOMPurify.sanitize(rawHtml);
-    }, [history?.generated_content]);
+    }, [history?.generated_content, streamedContent, isStreaming]);
 
     useEffect(() => {
         if (parsedHtml) {
@@ -57,8 +112,17 @@ export default function ShowContent({ history }) {
 
     const handleRegenerate = (e) => {
         e.preventDefault();
-        postRegenerate(route('content.history.regenerate', history.id));
+        postRegenerate(route('content.history.regenerate', history.id), {
+            onSuccess: () => {
+                setData('refinement', '');
+                startStreaming();
+            }
+        });
     };
+    
+    const [copied, setCopied] = useState(false);
+    const [wordCount, setWordCount] = useState(0);
+    const [readingTime, setReadingTime] = useState(0);
 
     return (
         <AppLayout header={<h2 className="text-xl font-semibold leading-tight text-foreground">Content Portal</h2>}>
@@ -182,15 +246,46 @@ export default function ShowContent({ history }) {
                             <div className="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-primary via-purple-500 to-primary/40 opacity-70" />
                             
                             <div className="p-8 md:p-16 lg:p-20">
-                                <article
-                                    className="prose prose-lg md:prose-xl dark:prose-invert max-w-none 
-                                    prose-p:leading-relaxed prose-p:text-foreground/90
-                                    prose-headings:font-black prose-headings:tracking-tight
-                                    prose-a:text-primary prose-a:font-bold prose-a:no-underline hover:prose-a:underline
-                                    prose-img:rounded-3xl prose-img:shadow-2xl
-                                    format-text"
-                                    dangerouslySetInnerHTML={{ __html: parsedHtml }}
-                                />
+                                {isStreaming && !streamedContent && !streamError && (
+                                    <div className="flex flex-col items-center justify-center py-20 space-y-6">
+                                        <div className="relative">
+                                            <div className="w-20 h-20 rounded-full border-4 border-primary/10 border-t-primary animate-spin" />
+                                            <Sparkles className="absolute inset-0 m-auto w-8 h-8 text-primary animate-pulse" />
+                                        </div>
+                                        <div className="text-center space-y-2">
+                                            <h3 className="text-xl font-bold tracking-tight">Consulting the AI...</h3>
+                                            <p className="text-muted-foreground text-sm uppercase tracking-widest font-black opacity-60">Architecting your masterpiece</p>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {streamError && (
+                                    <div className="max-w-md mx-auto py-20 space-y-6 text-center">
+                                        <div className="w-16 h-16 rounded-2xl bg-destructive/10 flex items-center justify-center mx-auto">
+                                            <AlertCircle className="w-8 h-8 text-destructive" />
+                                        </div>
+                                        <div className="space-y-2">
+                                            <h3 className="text-xl font-bold text-destructive">Generation Stalled</h3>
+                                            <p className="text-muted-foreground leading-relaxed">{streamError}</p>
+                                        </div>
+                                        <button 
+                                            onClick={startStreaming}
+                                            className="px-6 py-2 bg-primary text-primary-foreground rounded-lg font-bold hover:scale-105 transition-transform"
+                                        >
+                                            Retry Generation
+                                        </button>
+                                    </div>
+                                )}
+
+                                {(streamedContent || (!isStreaming && !streamError)) && (
+                                    <article
+                                        className={cn(
+                                            "prose prose-lg md:prose-xl dark:prose-invert max-w-none prose-p:leading-relaxed prose-p:text-foreground/90 prose-headings:font-black prose-headings:tracking-tight prose-a:text-primary prose-a:font-bold prose-a:no-underline hover:prose-a:underline prose-img:rounded-3xl prose-img:shadow-2xl format-text",
+                                            isStreaming && "animate-pulse-subtle"
+                                        )}
+                                        dangerouslySetInnerHTML={{ __html: parsedHtml }}
+                                    />
+                                )}
                             </div>
                         </div>
 

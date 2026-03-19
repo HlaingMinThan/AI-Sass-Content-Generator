@@ -32,6 +32,7 @@ Route::middleware('auth')->group(function () {
         return inertia('Content/Show', ['history' => $history]);
     })->name('content.history.show');
 
+    Route::get('/content/history/{history}/stream', [ContentController::class, 'stream'])->name('content.history.stream');
     Route::post('/content/history/{history}/regenerate', [ContentController::class, 'regenerate'])->name('content.history.regenerate');
 
     // Billing / Credits Route
