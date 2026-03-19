@@ -45,4 +45,14 @@ Route::middleware('auth')->group(function () {
     Route::post('/custom-tones/{customTone}/default', [\App\Http\Controllers\CustomToneController::class, 'setDefault'])->name('custom-tones.default');
 });
 
+// Admin Routes
+Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/users', [\App\Http\Controllers\Admin\UserController::class, 'index'])->name('users.index');
+    Route::patch('/users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'update'])->name('users.update');
+    Route::post('/users/{user}/credits', [\App\Http\Controllers\Admin\UserController::class, 'updateCredits'])->name('users.credits.update');
+    Route::delete('/users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'destroy'])->name('users.destroy');
+    
+    Route::get('/transactions', [\App\Http\Controllers\Admin\TransactionController::class, 'index'])->name('transactions.index');
+});
+
 require __DIR__.'/auth.php';

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
-import { LayoutDashboard, History, CreditCard, Menu, X, Sparkles, Palette } from 'lucide-react';
+import { LayoutDashboard, History, CreditCard, Menu, X, Sparkles, Palette, Users, ShieldCheck } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Dropdown from '@/Components/Dropdown';
 
@@ -14,6 +14,11 @@ export default function AppLayout({ header, children }) {
         { name: 'Content History', href: route('content.history.index'), icon: History, current: route().current('content.history.*') },
         { name: 'Billing', href: route('billing.index'), icon: CreditCard, current: route().current('billing.*') },
     ];
+
+    const adminNavigation = user.is_admin ? [
+        { name: 'Users', href: route('admin.users.index'), icon: Users, current: route().current('admin.users.*') },
+        { name: 'Transactions', href: route('admin.transactions.index'), icon: CreditCard, current: route().current('admin.transactions.*') },
+    ] : [];
 
     return (
         <div className="min-h-screen bg-background flex">
@@ -47,6 +52,29 @@ export default function AppLayout({ header, children }) {
                                 {item.name}
                             </Link>
                         ))}
+
+                        {adminNavigation.length > 0 && (
+                            <div className="pt-4 mt-4 border-t border-border/40 space-y-1">
+                                <div className="px-3 py-2 text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">
+                                    Administration
+                                </div>
+                                {adminNavigation.map((item) => (
+                                    <Link
+                                        key={item.name}
+                                        href={item.href}
+                                        className={cn(
+                                            "flex items-center gap-3 px-3 py-2.5 rounded-md text-sm font-medium transition-colors",
+                                            item.current
+                                                ? "bg-primary/10 text-primary"
+                                                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                                        )}
+                                    >
+                                        <item.icon className={cn("h-5 w-5", item.current ? "text-primary" : "text-muted-foreground")} />
+                                        {item.name}
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
                     </nav>
                 </div>
             </div>
@@ -80,6 +108,29 @@ export default function AppLayout({ header, children }) {
                                 {item.name}
                             </Link>
                         ))}
+
+                        {adminNavigation.length > 0 && (
+                            <div className="pt-4 mt-4 border-t border-border/40 space-y-1.5">
+                                <div className="px-3 py-2 text-[10px] font-black text-muted-foreground/60 uppercase tracking-widest">
+                                    Administration
+                                </div>
+                                {adminNavigation.map((item) => (
+                                    <Link
+                                        key={item.name}
+                                        href={item.href}
+                                        className={cn(
+                                            "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
+                                            item.current
+                                                ? "bg-primary text-primary-foreground shadow-sm"
+                                                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                                        )}
+                                    >
+                                        <item.icon className="h-5 w-5" />
+                                        {item.name}
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
                     </nav>
                 </div>
             </div>
