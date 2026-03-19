@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, usePage } from '@inertiajs/react';
-import { LayoutDashboard, History, CreditCard, Menu, X, Sparkles, Palette, Users, ShieldCheck } from 'lucide-react';
+import { LayoutDashboard, History, CreditCard, Menu, X, Sparkles, Palette, Users, ShieldCheck, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import Dropdown from '@/Components/Dropdown';
 
@@ -76,6 +76,18 @@ export default function AppLayout({ header, children }) {
                             </div>
                         )}
                     </nav>
+
+                    <div className="p-4 border-t border-border/40">
+                        <Link
+                            href={route('logout')}
+                            method="post"
+                            as="button"
+                            className="flex w-full items-center gap-3 px-3 py-2.5 rounded-md text-sm font-bold text-red-500 hover:bg-red-50 transition-colors"
+                        >
+                            <LogOut className="h-5 w-5" />
+                            Sign Out
+                        </Link>
+                    </div>
                 </div>
             </div>
 
@@ -132,6 +144,18 @@ export default function AppLayout({ header, children }) {
                             </div>
                         )}
                     </nav>
+
+                    <div className="p-4 border-t border-border/40">
+                        <Link
+                            href={route('logout')}
+                            method="post"
+                            as="button"
+                            className="flex w-full items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold text-red-500 hover:bg-red-50 transition-colors"
+                        >
+                            <LogOut className="h-5 w-5" />
+                            Sign Out
+                        </Link>
+                    </div>
                 </div>
             </div>
 
