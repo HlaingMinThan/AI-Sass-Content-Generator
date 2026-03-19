@@ -79,7 +79,7 @@ export default function HistoryIndex({ histories, filters }) {
                                         <tr key={item.id} className="hover:bg-muted/30 transition-colors group">
                                             <td className="px-8 py-6">
                                                 <div className="font-bold text-foreground line-clamp-1 mb-1 max-w-[450px]">
-                                                    {item.generated_content?.replace(/###\s*\[.*?\]\n?/g, '').replace(/###/g, '').trim() || "Generating..."}
+                                                    {item.generated_content?.replace(/#+\s*/g, '').replace(/\*+|_|`|\[|\]/g, '').trim() || "Generating..."}
                                                 </div>
                                                 <div className="text-xs text-muted-foreground flex items-center gap-2 mt-2 group-hover:text-primary transition-colors">
                                                     <FileText className="h-3 w-3 shrink-0" />
